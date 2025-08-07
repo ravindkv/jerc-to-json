@@ -1,0 +1,160 @@
+# global config file for jerc2json
+# (edit to suit your needs)
+
+# where to download correction tarballs from
+sources:
+  jec:
+    type: github
+    url: https://github.com/cms-jet/JECDatabase
+    branch: master
+  jer:
+    type: github
+    url: https://github.com/cms-jet/JRDatabase
+    branch: master
+  # jec:
+  #   type: localdir
+  #   dir: /path/to/local/JECDatabase
+  # jer:
+  #   type: localdir
+  #   dir: /path/to/local/JRDatabase
+
+# working directory for downloaded tarballs
+# (will be created if it does not exist)
+work_dir: work
+
+# output directory for created JSON files
+# (will be created if it does not exist)
+output_dir: json_files
+
+# default values (can be overridden per-era)
+defaults:
+  # correction version, needs to be incremented every time
+  # corrections with the same name are updated after being
+  # published in the `jsonpog-integration` repo
+  correction_version: 2
+
+  # jet algorithms to process
+  algos:
+  - AK4PFchs
+  - AK8PFPuppi
+
+  # output JSON files to produce
+  outputs:
+    - name: jet_jerc
+      algos:
+      - AK4PFchs
+    - name: fatJet_jerc
+      algos:
+      - AK8PFPuppi
+
+  # uncertainty sets
+  uncertainty_sets:
+    default:
+      filename_prefix: ""
+      uncertainty_prefix: ""
+    regrouped:
+      filename_prefix: "RegroupedV2_"
+      uncertainty_prefix: "Regrouped_"
+
+  # correction levels
+  levels:
+    jec:
+      simple:
+      - L1FastJet
+      - L2Relative
+      - L3Absolute
+      - L2L3Residual
+      compound:
+        L1L2L3Res:
+        - L1FastJet
+        - L2Relative
+        - L3Absolute
+        - L2L3Residual
+    jer:
+      simple:
+        - PtResolution
+        - EtaResolution
+        - PhiResolution
+        - ScaleFactor
+
+# all possible input variables
+input_variables:
+  JetA:
+    description: "area of the jet"
+    type: real
+    test_values:
+    - 0.12
+  JetEta:
+    description: "pseudorapidity of the jet"
+    type: real
+    test_values:
+    - 0.1
+  JetPhi:
+    description: "azimuthal angle of the jet"
+    type: real
+    test_values:
+    - 0.12
+  JetPt:
+    description: "pT of the jet before specific correction (for JER and uncertainties: after all corrections applied)"
+    type: real
+    test_values:
+    - 200
+  Rho:
+    description: "energy density rho (as measure of PU)"
+    type: real
+    test_values:
+    - 20
+  systematic:
+    description: "systematics: nom, up, down"
+    type: string
+    test_values:
+    - nom
+    - up
+    - down
+
+# eras for which to provide JSON files
+eras:
+
+  Run2Summer19UL16:
+    jec:
+      names:
+      - Summer19UL16_RunFGH_V7_DATA
+      - Summer19UL16_V7_MC
+    jer:
+      names:
+      - Summer20UL16_JRV3_MC
+  
+  Run2Summer19UL16APV:
+    jec:
+      names:
+      - Summer19UL16APV_RunBCD_V7_DATA
+      - Summer19UL16APV_RunEF_V7_DATA
+      - Summer19UL16APV_V7_MC
+    jer:
+      names:
+      - Summer20UL16APV_JRV3_MC
+  
+  Run2Summer19UL17:
+    jec:
+      names:
+      - Summer19UL17_RunB_V5_DATA
+      - Summer19UL17_RunC_V5_DATA
+      - Summer19UL17_RunD_V5_DATA
+      - Summer19UL17_RunE_V5_DATA
+      - Summer19UL17_RunF_V5_DATA
+      - Summer19UL17_V5_MC
+    jer:
+      names:
+      - Summer19UL17_JRV2_MC
+  
+  Run2Summer19UL18:
+    jec:
+      names:
+      - Summer19UL18_RunA_V5_DATA
+      - Summer19UL18_RunB_V5_DATA
+      - Summer19UL18_RunC_V5_DATA
+      - Summer19UL18_RunD_V5_DATA
+      - Summer19UL18_V5_MC
+    jer:
+      names:
+      - Summer19UL18_JRV2_MC

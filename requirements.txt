@@ -1,0 +1,5 @@
+rich>=10.9.0
+correctionlib>=2.1.0
+json>=2.0.9
+yaml>=5.4.1
+numpy>=1.21.2

@@ -1,0 +1,211 @@
+# global config file for jerc2json
+# (edit to suit your needs)
+
+# where to download correction tarballs from
+sources:
+  jec:
+    type: github
+    url: https://github.com/cms-jet/JECDatabase
+    branch: master
+  jer:
+    type: github
+    url: https://github.com/cms-jet/JRDatabase
+    branch: master
+  # jec:
+  #   type: localdir
+  #   dir: /path/to/local/JECDatabase
+  # jer:
+  #   type: localdir
+  #   dir: /path/to/local/JRDatabase
+
+# working directory for downloaded tarballs
+# (will be created if it does not exist)
+work_dir: work
+
+# output directory for created JSON files
+# (will be created if it does not exist)
+output_dir: json_files
+
+# default values (can be overridden per-era)
+defaults:
+  # correction version, needs to be incremented every time
+  # corrections with the same name are updated after being
+  # published in the `jsonpog-integration` repo
+  correction_version: 1
+
+  # jet algorithms to process
+  algos:
+  - AK4PFPuppi
+  - AK8PFPuppi
+
+  # output JSON files to produce
+  outputs:
+    - name: jet_jerc
+      algos:
+      - AK4PFPuppi
+    - name: fatJet_jerc
+      algos:
+      - AK8PFPuppi
+
+  # correction levels
+  levels:
+    jec:
+      simple:
+      - L1FastJet
+      - L2Relative
+      - L3Absolute
+      - L2L3Residual
+      compound:
+        L1L2L3Res:
+        - L1FastJet
+        - L2Relative
+        - L3Absolute
+        - L2L3Residual
+    jer:
+      simple:
+        - PtResolution
+        # not available yet:
+        # - EtaResolution
+        # - PhiResolution
+        - ScaleFactor
+
+# all possible input variables
+input_variables:
+  JetA:
+    description: "area of the jet"
+    type: real
+    test_values:
+    - 0.12
+  JetEta:
+    description: "pseudorapidity of the jet"
+    type: real
+    test_values:
+    - 0.1
+  JetPhi:
+    description: "azimuthal angle of the jet"
+    type: real
+    test_values:
+    - 0.12
+  JetPt:
+    description: "pT of the jet before specific correction (for JER and uncertainties: after all corrections applied)"
+    type: real
+    test_values:
+    - 200
+  Rho:
+    description: "energy density rho (as measure of PU)"
+    type: real
+    test_values:
+    - 20
+  systematic:
+    description: "systematics: nom, up, down"
+    type: string
+    test_values:
+    - nom
+    - up
+    - down
+  run:
+    description: "run number"
+    type: real
+
+# eras for which to provide JSON files
+eras:
+  Run3Summer22_22Sep2023:
+    jec:
+      correction_version: 2
+      names:
+      - name: Summer22_22Sep2023_RunCD_V2_DATA
+      - name: Summer22_22Sep2023_V2_MC
+    jer:
+      correction_version: 2
+      names:
+      - name: Summer22_22Sep2023_JRV1_MC
+
+  Run3Summer22EE_22Sep2023:
+    jec:
+      correction_version: 2
+      names:
+      - name: Summer22EE_22Sep2023_RunE_V2_DATA
+      - name: Summer22EE_22Sep2023_RunF_V2_DATA
+      - name: Summer22EE_22Sep2023_RunG_V2_DATA
+      - name: Summer22EE_22Sep2023_V2_MC
+    jer:
+      correction_version: 2
+      names:
+      - Summer22EE_22Sep2023_JRV1_MC
+
+  Run3Summer23Prompt23:
+    jec:
+      correction_version: 2
+      names:
+      - name: Summer23Prompt23_V2_MC
+      - name: Summer23Prompt23_V2_DATA
+        inputs:
+        - tag: Summer23Prompt23_RunCv123_V2_DATA
+          first_run: 367080
+        - tag: Summer23Prompt23_RunCv4_V2_DATA
+          first_run: 367765
+        last_run: 369802
+    jer:
+      correction_version: 2
+      names:
+      - name: Summer23Prompt23_RunCv1234_JRV1_MC
+      - name: Summer23Prompt23_RunCv123_JRV1_MC
+      - name: Summer23Prompt23_RunCv4_JRV1_MC
+
+  Run3Summer23BPixPrompt23:
+    jec:
+      correction_version: 2
+      names:
+      - name: Summer23BPixPrompt23_V3_MC
+      - name: Summer23BPixPrompt23_V3_DATA
+        inputs:
+        - tag: Summer23BPixPrompt23_RunD_V3_DATA
+          first_run: 369803
+        last_run: 372415
+    jer:
+      correction_version: 2
+      names:
+      - name: Summer23BPixPrompt23_RunD_JRV1_MC
+
+  Run3Summer24Prompt24:
+    # only have AK4PFPuppi for now
+    outputs:
+      - name: jet_jerc
+        algos:
+        - AK4PFPuppi
+
+    jec:
+      names:
+      - name: Summer24Prompt24_V1_MC
+      - name: Summer24Prompt24_V1_DATA
+        inputs:
+        - tag: Summer24Prompt24_RunCnib1_V1_DATA
+          first_run: 379412
+        - tag: Summer24Prompt24_RunDnib1_V1_DATA
+          first_run: 380253
+        - tag: Summer24Prompt24_RunEnib1_V1_DATA
+          first_run: 380948
+        - tag: Summer24Prompt24_RunFnib1_V1_DATA
+          first_run: 381944
+        - tag: Summer24Prompt24_RunFnib2_V1_DATA
+          first_run: 382298
+        - tag: Summer24Prompt24_RunFnib3_V1_DATA
+          first_run: 383247
+        - tag: Summer24Prompt24_RunGnib1_V1_DATA
+          first_run: 383780
+        - tag: Summer24Prompt24_RunGnib2_V1_DATA
+          first_run: 384933
+        - tag: Summer24Prompt24_RunHnib1_V1_DATA
+          first_run: 385814
+        - tag: Summer24Prompt24_RunInib1_V1_DATA
+          first_run: 386409
+        last_run: 387121
+      algos:
+      - AK4PFPuppi
+
+    jer:
+      names:
+      # use Summer23BPixPrompt23 for now
+      - name: Summer23BPixPrompt23_RunD_JRV1_MC
+      algos:
+      - AK4PFPuppi
