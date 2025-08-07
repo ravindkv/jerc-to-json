@@ -250,20 +250,58 @@ class JERCToCorrectionConverter:
                 "variables"
             )
 
-        # find neighboring bins in the current variable
-        # and fill list of bin edges for `Binning` object
-        edges = [
-            # start with lower edge of first bin
-            python_float(self.x.get_record(idx_record).xMin(idx_binvar))
-        ]
-        bin_record_idxs = []
-        idx_record_next = idx_record
-        while idx_record_next > -1:
-            bin_record_idxs.append(idx_record_next)
-            edges.append(
-                python_float(self.x.get_record(idx_record_next).xMax(idx_binvar))
+        # find neighbouring bins in the current variable.  The previous
+        # implementation relied on `neighbourBin` to walk along the binning
+        # axis.  Some JERC text files are not strictly continuous (e.g. there is
+        # a gap at `eta=0` in the example in the issue), in which case
+        # `neighbourBin` stops at the gap and the positive part of the range is
+        # never visited.  To make the bin edge collection robust we inspect all
+        # records and select those that correspond to the same configuration of
+        # the *other* binning variables as the reference record.  The union of
+        # their lower and upper edges gives the complete binning range.
+
+        # collect the min/max values for the remaining binning variables of the
+        # reference record
+        ref_record = self.x.get_record(idx_record)
+        other_binvars = [i for i in range(self.x.n_binning_variables) if i != idx_binvar]
+        ref_other_ranges = [
+            (
+                python_float(ref_record.xMin(i)),
+                python_float(ref_record.xMax(i)),
             )
-            idx_record_next = self.x.table.neighbourBin(idx_record_next, idx_binvar, True)
+            for i in other_binvars
+        ]
+
+        # iterate over all records to find those matching the reference binning
+        edges_set: set[float] = set()
+        bin_map: dict[tuple[float, float], int] = {}
+        n_records = self.x.table.size()
+        for idx in range(n_records):
+            rec = self.x.get_record(idx)
+
+            # keep only bins where all other binning variables match the
+            # reference record
+            matches = True
+            for (j, (ref_min, ref_max)) in zip(other_binvars, ref_other_ranges):
+                if (
+                    python_float(rec.xMin(j)) != ref_min
+                    or python_float(rec.xMax(j)) != ref_max
+                ):
+                    matches = False
+                    break
+            if not matches:
+                continue
+
+            xmin = python_float(rec.xMin(idx_binvar))
+            xmax = python_float(rec.xMax(idx_binvar))
+            edges_set.add(xmin)
+            edges_set.add(xmax)
+            bin_map[(xmin, xmax)] = idx
+
+        edges = sorted(edges_set)
+        bin_record_idxs = [
+            bin_map[(edges[i], edges[i + 1])] for i in range(len(edges) - 1)
+        ]
 
         return edges, bin_record_idxs
 
